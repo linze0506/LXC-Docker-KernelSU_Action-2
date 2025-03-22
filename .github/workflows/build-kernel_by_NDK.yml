@@ -251,6 +251,11 @@ jobs:
        else
            echo "Kernel output file is empty"
            exit 1
+       if [ -f android-kernel/out/drivers/staging/prima/wlan.ko ]; then
+           echo "wlan.ko_IS_OK=true" >> $GITHUB_ENV
+       else
+           echo "wlan.ko file is empty"
+           exit 1
        fi
        if [ ${{ env.NEED_DTBO }} = true ]; then
            if [ -f android-kernel/out/arch/${{ env.ARCH }}/boot/dtbo.img ]; then
@@ -295,6 +300,13 @@ jobs:
       with:
         name: ${{ env.KERNEL_IMAGE_NAME }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
         path: kernel_workspace/android-kernel/out/arch/${{ env.ARCH }}/boot/${{ env.KERNEL_IMAGE_NAME }}
+
+    - name: Upload wlan.ko
+      if: env.wlan.ko_IS_OK == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: wlan.ko
+        path: kernel_workspace/android-kernel/out/drivers/staging/prima/wlan.ko
 
     - name: Upload AnyKernel3
       if: env.CHECK_FILE_IS_OK == 'true'
