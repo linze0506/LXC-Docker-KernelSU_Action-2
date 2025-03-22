@@ -71,6 +71,11 @@ jobs:
         sudo apt install -y python2 lld gcc binutils-arm-linux-gnueabi binutils-aarch64-linux-gnu curl wget vim git ccache automake flex lzop bison gperf build-essential zip zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler kmod python3 python3-pip
         mkdir -p $GITHUB_WORKSPACE/kernel_workspace
 
+    - name: 切换python2.7
+      run: |
+        sudo rm -f /usr/bin/python
+        sudo ln -s /usr/bin/python2.7 /usr/bin/python
+    
     - name: Download Android NDK
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
@@ -131,7 +136,7 @@ jobs:
         fi
 
         if [ ${{ env.NDK_VERSION }} = 15 ]; then
-             wget -O ndk.zip https://dl.google.com/android/repository/android-ndk-r15c-linux-x86_64.zip
+             wget -O ndk.zip https://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
              unzip ndk.zip -d tool/
         fi
         cd ./tool
@@ -227,7 +232,8 @@ jobs:
     - name: Build kernel
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-        export PATH=$GITHUB_WORKSPACE/kernel_workspace/tool/NDK/toolchains/llvm/prebuilt/linux-x86_64/bin:$GITHUB_WORKSPACE/kernel_workspace/tool/NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin:$GITHUB_WORKSPACE/kernel_workspace/tool/NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin:$PATH
+        export PATH=$GITHUB_WORKSPACE/kernel_workspace/tool/NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin:$PATH
+        export CROSS_COMPILE=aarch64-linux-android-
         export KBUILD_BUILD_HOST=Github-Action
         export KBUILD_BUILD_USER=$(echo ${{ github.actor }} | tr A-Z a-z)
         if [ ! -z ${{ env.KSU_EXPECTED_SIZE }} ] && [ ! -z ${{ env.KSU_EXPECTED_HASH }} ]; then
@@ -236,11 +242,11 @@ jobs:
         fi
 
         if [ -f $GITHUB_WORKSPACE/kernel_workspace/tool/NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-ld ]; then
-            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} ${{ env.KERNEL_CONFIG }}
-            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CC=clang CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
+            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CROSS_COMPILE=aarch64-linux-android- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} ${{ env.KERNEL_CONFIG }}
+            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CROSS_COMPILE=aarch64-linux-android- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
         else
-            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CC=clang CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CLANG_TRIPLE=aarch64-linux-gnu- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} ${{ env.KERNEL_CONFIG }}
-            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CC=clang CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CLANG_TRIPLE=aarch64-linux-gnu- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
+            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CROSS_COMPILE=aarch64-linux-android- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} ${{ env.KERNEL_CONFIG }}
+            make -j$(nproc --all) O=out ARCH=${{ env.ARCH }} CROSS_COMPILE=aarch64-linux-android- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
         fi
 
     - name: Check a kernel output files
