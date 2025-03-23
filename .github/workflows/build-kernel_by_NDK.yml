@@ -258,6 +258,7 @@ jobs:
        else
            echo "Kernel output file is empty"
            exit 1
+       fi
        if [ -f android-kernel/out/drivers/staging/prima/wlan.ko ]; then
            echo "wlan.ko_IS_OK=true" >> $GITHUB_ENV
        else
