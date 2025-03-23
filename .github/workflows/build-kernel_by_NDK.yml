@@ -243,8 +243,8 @@ jobs:
         fi
 
         if [ -f $GITHUB_WORKSPACE/kernel_workspace/tool/NDK/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-ld ]; then
-            make -j$(nproc --all) O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-android- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} ${{ env.KERNEL_CONFIG }}
-            make -j$(nproc --all) O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-android- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
+            make -j$(nproc --all) O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-android- ${{ env.KERNEL_CONFIG }}
+            make -j$(nproc --all) O=out ARCH=arm64 CROSS_COMPILE=aarch64-linux-android-
         else
             make -j$(nproc --all) O=out LLVM=1 LLVM_IAS=1 ARCH=${{ env.ARCH }} CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CLANG_TRIPLE=aarch64-linux-gnu- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} ${{ env.KERNEL_CONFIG }}
             make -j$(nproc --all) O=out LLVM=1 LLVM_IAS=1 ARCH=${{ env.ARCH }} CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- CLANG_TRIPLE=aarch64-linux-gnu- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
