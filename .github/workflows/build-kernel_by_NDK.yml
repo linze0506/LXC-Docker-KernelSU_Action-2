@@ -286,6 +286,9 @@ jobs:
         if [ ${{ env.CHECK_DTBO_IS_OK }} = true ]; then
             cp android-kernel/out/arch/${{ env.ARCH }}/boot/dtbo.img AnyKernel3/
         fi
+        if [ ${{ env.wlan.ko_IS_OK }} = true ]; then
+            cp android-kernel/out/drivers/staging/prima/wlan.ko AnyKernel3/modules/system/lib/modules/
+        fi
         rm -rf AnyKernel3/.git* AnyKernel3/README.md
 
     - name: Make boot image
@@ -308,13 +311,6 @@ jobs:
       with:
         name: ${{ env.KERNEL_IMAGE_NAME }}${{ env.UPLOADNAME }}-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
         path: kernel_workspace/android-kernel/out/arch/${{ env.ARCH }}/boot/${{ env.KERNEL_IMAGE_NAME }}
-
-    - name: Upload wlan.ko
-      if: env.wlan.ko_IS_OK == 'true'
-      uses: actions/upload-artifact@v4
-      with:
-        name: wlan.ko
-        path: kernel_workspace/android-kernel/out/drivers/staging/prima/wlan.ko
 
     - name: Upload AnyKernel3
       if: env.CHECK_FILE_IS_OK == 'true'
